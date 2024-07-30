@@ -1,5 +1,7 @@
 #include "infer.hpp"
 #include "yolo.hpp"
+#include <NvInfer.h>
+#include <cuda_runtime.h>
 
 namespace yolo {
 
@@ -551,7 +553,10 @@ class InferImpl : public Infer {
     }
     return true;
   }
-
+  virtual BoxArray forward(const Image& image, float confidence_threshold, void* stream = nullptr) override{
+      this->confidence_threshold_ = confidence_threshold;
+      return forward(image, stream);
+  }
   virtual BoxArray forward(const Image &image, void *stream = nullptr) override {
     auto output = forwards({image}, stream);
     if (output.empty()) return {};
